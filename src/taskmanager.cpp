@@ -4,7 +4,7 @@
 #include <ranges>
 #include <vector>
 #include <QDebug>
-
+#include <QSettings>
 TaskManager* TaskManager::instance() {
     static TaskManager* inst = new TaskManager(QCoreApplication::instance());
     return inst;
@@ -197,4 +197,27 @@ QJsonArray TaskManager::inboxTasks() const {
     for (const auto &t : sorted)
         result.append(t.toJson());
     return result;
+}
+
+
+int TaskManager::dialogX() const {
+    QSettings settings("EisenNotion", "EisenNotion");
+    return settings.value("dialogX", -1).toInt(); // -1 значит "не задано"
+}
+
+void TaskManager::setDialogX(int x) {
+    QSettings settings("EisenNotion", "EisenNotion");
+    settings.setValue("dialogX", x);
+    emit dialogPositionChanged();
+}
+
+int TaskManager::dialogY() const {
+    QSettings settings("EisenNotion", "EisenNotion");
+    return settings.value("dialogY", -1).toInt();
+}
+
+void TaskManager::setDialogY(int y) {
+    QSettings settings("EisenNotion", "EisenNotion");
+    settings.setValue("dialogY", y);
+    emit dialogPositionChanged();
 }

@@ -21,13 +21,20 @@ public:
     Q_INVOKABLE void toggleComplete(const QString &id);
     Q_INVOKABLE void moveTaskToQuadrant(const QString &id, int newQuadrant);
     Q_INVOKABLE QJsonArray inboxTasks() const;
+    Q_PROPERTY(int dialogX READ dialogX WRITE setDialogX NOTIFY dialogPositionChanged)
+    Q_PROPERTY(int dialogY READ dialogY WRITE setDialogY NOTIFY dialogPositionChanged)
 
+    int dialogX() const;
+    void setDialogX(int x);
+    int dialogY() const;
+    void setDialogY(int y);
     QString searchQuery() const;
     void setSearchQuery(const QString &query);
 
 signals:
     void dataChanged();
     void searchQueryChanged();
+    void dialogPositionChanged();
 
 private slots:
     void saveToDisk();

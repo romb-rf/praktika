@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects   // на всякий случай, если нужен DropShadow, но мы не используем сложное
 import EisenNotion 1.0
 
 ApplicationWindow {
@@ -11,16 +10,34 @@ ApplicationWindow {
     title: "EisenNotion"
     color: "#F0F2F5"
 
+    // Явная светлая палитра, чтобы избежать влияния системной тёмной темы
+    palette: Palette {
+        window: "#F0F2F5"
+        windowText: "#2C3E50"
+        base: "#FFFFFF"
+        alternateBase: "#F7F9FB"
+        text: "#2C3E50"
+        button: "#F0F2F5"
+        buttonText: "#2C3E50"
+        highlight: "#3498DB"
+        highlightedText: "#FFFFFF"
+        toolTipBase: "#FFFFFF"
+        toolTipText: "#2C3E50"
+    }
+
+    // Основной контент: матрица слева + панель справа
     RowLayout {
         anchors.fill: parent
         spacing: 0
 
+        // Матрица 2x2
         MatrixView {
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width * 0.58
             Layout.margins: 10
         }
 
+        // Правая панель инструментов и "Входящие"
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -38,7 +55,6 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
                     font.pixelSize: 13
-                    font.family: "Segoe UI"
                     palette {
                         button: "#3498DB"
                         buttonText: "#FFFFFF"
@@ -49,7 +65,7 @@ ApplicationWindow {
                     }
                     onClicked: {
                         taskDialog.editingTaskId = ""
-                        taskDialog.open()
+                        taskDialog.show()
                     }
                 }
 
@@ -58,7 +74,6 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 36
                     font.pixelSize: 13
-                    font.family: "Segoe UI"
                     flat: true
                     enabled: false
                     opacity: 0.6
@@ -69,7 +84,6 @@ ApplicationWindow {
                     placeholderText: "Поиск по задачам..."
                     Layout.fillWidth: true
                     font.pixelSize: 13
-                    font.family: "Segoe UI"
                     background: Rectangle {
                         radius: 6
                         color: "#F7F9FB"
@@ -88,14 +102,12 @@ ApplicationWindow {
                     text: "📥 Входящие"
                     font.bold: true
                     font.pixelSize: 14
-                    font.family: "Segoe UI"
                     color: "#2C3E50"
                 }
                 Text {
                     text: "Перетащите задачу в нужный квадрант"
                     font.pixelSize: 11
                     color: "#95A5A6"
-                    font.family: "Segoe UI"
                 }
 
                 ListView {
@@ -120,10 +132,7 @@ ApplicationWindow {
         }
     }
 
-    TaskDialog {
-        id: taskDialog
-    }
-
+    // Обновление модели входящих при изменении данных
     Connections {
         target: TaskManager
         function onDataChanged() {
@@ -133,5 +142,10 @@ ApplicationWindow {
 
     Component.onCompleted: {
         inboxList.model = JSON.parse(JSON.stringify(TaskManager.inboxTasks()))
+    }
+
+    // Диалог создания/редактирования задачи
+    TaskDialog {
+        id: taskDialog
     }
 }

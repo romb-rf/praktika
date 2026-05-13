@@ -97,11 +97,13 @@ Item {
                 background: null
             }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: taskClicked(taskData)
-                z: -1
-            }
+        } // Конец RowLayout
+
+        // Клик для редактирования (вынесен из RowLayout)
+        MouseArea {
+            anchors.fill: parent
+            onClicked: taskClicked(taskData)
+            z: -1
         }
-    }
-}
+    } // Конец Rectangle
+} // Конец Item
