@@ -117,32 +117,38 @@ Window {
                 Layout.margins: 16
                 spacing: 14
 
+                // Название задачи
                 TextField {
                     id: titleField
                     placeholderText: "Название задачи"
                     Layout.fillWidth: true
-                    font.pixelSize: 14
-                    color: "#2C3E50"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#1a237e"
                     placeholderTextColor: "#95A5A6"
                     background: Rectangle {
-                        radius: 6
-                        color: "#F7F9FB"
-                        border.color: "#D5DCE3"
+                        radius: 8
+                        color: "white"
+                        border.color: "#3f51b5"
+                        border.width: 1
                     }
                 }
 
+                // Описание
                 TextArea {
                     id: descField
                     placeholderText: "Описание (можно Markdown)"
                     Layout.fillWidth: true
                     Layout.preferredHeight: 80
-                    font.pixelSize: 13
-                    color: "#2C3E50"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#1a237e"
                     placeholderTextColor: "#95A5A6"
                     background: Rectangle {
-                        radius: 6
-                        color: "#F7F9FB"
-                        border.color: "#D5DCE3"
+                        radius: 8
+                        color: "white"
+                        border.color: "#3f51b5"
+                        border.width: 1
                     }
                 }
 
@@ -151,40 +157,84 @@ Window {
                     id: quadrantBox
                     model: ["Без категории (входящие)", "Срочно-важно", "Срочно-неважно", "Несрочно-важно", "Несрочно-неважно"]
                     currentIndex: 0
-                    font.pixelSize: 13
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 36
+                    Layout.preferredHeight: 40
+
+                    background: Rectangle {
+                        radius: 8
+                        color: "white"
+                        border.color: "#3f51b5"
+                        border.width: 1
+                    }
+                    contentItem: Text {
+                        leftPadding: 12
+                        rightPadding: 12
+                        verticalAlignment: Text.AlignVCenter
+                        text: quadrantBox.currentText
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "#1a237e"
+                    }
+                    indicator: Canvas {
+                        width: 12
+                        height: 8
+                        contextType: "2d"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: 12
+                        onPaint: {
+                            context.reset();
+                            context.moveTo(0, 0);
+                            context.lineTo(width, 0);
+                            context.lineTo(width / 2, height);
+                            context.closePath();
+                            context.fillStyle = "#3f51b5";
+                            context.fill();
+                        }
+                    }
+
+                    popup: Popup {
+                        y: parent.height + 4
+                        width: parent.width
+                        height: Math.min(250, quadrantBox.count * 40)
+                        padding: 4
+                        background: Rectangle {
+                            radius: 8
+                            color: "#ffffff"
+                            border.color: "#3f51b5"
+                            border.width: 1
+                        }
+
+                        contentItem: ListView {
+                            clip: true
+                            implicitHeight: height
+                            model: quadrantBox.popup.visible ? quadrantBox.delegateModel : null
+                            currentIndex: quadrantBox.highlightedIndex
+                            ScrollIndicator.vertical: ScrollIndicator {}
+                        }
+                    }
 
                     delegate: ItemDelegate {
                         width: parent.width
+                        height: 40
                         text: modelData
-                        font.pixelSize: 13
-                        highlighted: parent.highlightedIndex === index
+                        font.pixelSize: 14
+                        highlighted: index === quadrantBox.highlightedIndex
                         background: Rectangle {
-                            color: highlighted ? "#3498DB" : "transparent"
-                            radius: 4
+                            radius: 6
+                            color: highlighted ? "#3f51b5" : "transparent"
                         }
                         contentItem: Text {
                             text: modelData
                             font: parent.font
-                            color: highlighted ? "white" : "#2C3E50"
+                            color: highlighted ? "white" : "#1a237e"
                             verticalAlignment: Text.AlignVCenter
+                            leftPadding: 12
                         }
-                    }
-
-                    background: Rectangle {
-                        radius: 6
-                        color: "#F7F9FB"
-                        border.color: "#D5DCE3"
-                    }
-
-                    indicator: Text {
-                        text: "▼"
-                        font.pixelSize: 10
-                        color: "#7F8C8D"
-                        anchors.right: parent.right
-                        anchors.rightMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            quadrantBox.currentIndex = index
+                            quadrantBox.popup.close()
+                        }
                     }
                 }
 
@@ -192,42 +242,47 @@ Window {
                 RowLayout {
                     Text {
                         text: "Дата и время:"
-                        font.pixelSize: 13
-                        color: "#2C3E50"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "#1a237e"
                     }
 
                     Button {
                         id: dateButton
                         text: selectedDate.toLocaleDateString(Qt.locale(), "dd.MM.yyyy")
-                        font.pixelSize: 13
-                        palette { buttonText: "#2C3E50" }
-                        onClicked: calendarPopup.open()
+                        font.pixelSize: 16
+                        font.bold: true
+                        palette { buttonText: "#1a237e" }
                         background: Rectangle {
-                            radius: 6
-                            color: "#F7F9FB"
-                            border.color: "#D5DCE3"
+                            radius: 8
+                            color: "white"
+                            border.color: "#3f51b5"
+                            border.width: 1
                         }
+                        onClicked: calendarPopup.open()
                     }
 
                     TextField {
                         id: timeField
                         placeholderText: "12:00"
                         inputMask: "00:00"
-                        font.pixelSize: 13
-                        color: "#2C3E50"
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "#1a237e"
                         placeholderTextColor: "#95A5A6"
                         Layout.preferredWidth: 70
                         text: "12:00"
                         validator: RegularExpressionValidator { regularExpression: /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/ }
                         background: Rectangle {
-                            radius: 6
-                            color: "#F7F9FB"
-                            border.color: "#D5DCE3"
+                            radius: 8
+                            color: "white"
+                            border.color: "#3f51b5"
+                            border.width: 1
                         }
                     }
                 }
 
-                // Всплывающий календарь с белым фоном
+                // Календарь
                 Popup {
                     id: calendarPopup
                     width: 280
@@ -240,29 +295,57 @@ Window {
                     background: Rectangle {
                         color: "#FFFFFF"
                         radius: 8
+                        border.color: "#E0E4E8"
                     }
 
                     ColumnLayout {
                         anchors.fill: parent
                         spacing: 4
                         RowLayout {
+                            Layout.fillWidth: true
                             Button { text: "<"; onClicked: { if (currentMonth === 0) { currentMonth = 11; currentYear-- } else { currentMonth-- } } }
                             Label {
                                 text: new Date(currentYear, currentMonth).toLocaleDateString(Qt.locale(), "MMMM yyyy")
-                                font.pixelSize: 14; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                horizontalAlignment: Text.AlignHCenter
                                 color: "#2C3E50"
                             }
                             Button { text: ">"; onClicked: { if (currentMonth === 11) { currentMonth = 0; currentYear++ } else { currentMonth++ } } }
                         }
+
                         GridLayout {
-                            columns: 7; Layout.fillWidth: true
-                            Repeater { model: ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]; delegate: Label { text: modelData; font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; color: "#7F8C8D" } }
+                            columns: 7
+                            Layout.fillWidth: true
+                            columnSpacing: 0
+                            rowSpacing: 0
+                            Repeater {
+                                model: ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
+                                delegate: Rectangle {
+                                    width: 30
+                                    height: 20
+                                    color: "transparent"
+                                    Label {
+                                        anchors.centerIn: parent
+                                        text: modelData
+                                        font.pixelSize: 11
+                                        color: "#7F8C8D"
+                                        horizontalAlignment: Text.AlignHCenter
+                                    }
+                                }
+                            }
                         }
+
                         GridLayout {
-                            id: daysGrid; columns: 7; Layout.fillWidth: true
+                            id: daysGrid
+                            columns: 7
+                            Layout.fillWidth: true
+                            columnSpacing: 0
+                            rowSpacing: 0
                             Repeater {
                                 model: {
-                                    var days = []; var firstDay = firstDayOfWeek(currentYear, currentMonth)
+                                    var days = []
+                                    var firstDay = firstDayOfWeek(currentYear, currentMonth)
                                     var startOffset = (firstDay + 6) % 7
                                     for (var i = 0; i < startOffset; i++) days.push(0)
                                     var total = daysInMonth(currentYear, currentMonth)
@@ -271,8 +354,10 @@ Window {
                                     return days
                                 }
                                 delegate: Rectangle {
-                                    width: 30; height: 30
-                                    color: modelData === 0 ? "transparent" : (new Date(currentYear, currentMonth, modelData).toDateString() === selectedDate.toDateString() ? "#3498DB" : "transparent")
+                                    width: 30
+                                    height: 30
+                                    color: modelData === 0 ? "transparent" :
+                                           (new Date(currentYear, currentMonth, modelData).toDateString() === selectedDate.toDateString() ? "#3498DB" : "transparent")
                                     radius: 4
                                     Label {
                                         anchors.centerIn: parent
@@ -280,31 +365,52 @@ Window {
                                         font.pixelSize: 12
                                         color: modelData !== 0 && new Date(currentYear, currentMonth, modelData).toDateString() === selectedDate.toDateString() ? "white" : "#2C3E50"
                                     }
-                                    MouseArea { anchors.fill: parent; enabled: modelData !== 0; onClicked: { selectedDate = new Date(currentYear, currentMonth, modelData); calendarPopup.close() } }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        enabled: modelData !== 0
+                                        onClicked: {
+                                            selectedDate = new Date(currentYear, currentMonth, modelData)
+                                            calendarPopup.close()
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
+                // Теги
                 TextField {
                     id: tagsField
                     placeholderText: "Теги через запятую"
                     Layout.fillWidth: true
-                    font.pixelSize: 13
-                    color: "#2C3E50"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#1a237e"
                     placeholderTextColor: "#95A5A6"
-                    background: Rectangle { radius: 6; color: "#F7F9FB"; border.color: "#D5DCE3" }
+                    background: Rectangle {
+                        radius: 8
+                        color: "white"
+                        border.color: "#3f51b5"
+                        border.width: 1
+                    }
                 }
 
+                // Проект
                 TextField {
                     id: projectField
                     placeholderText: "Проект"
                     Layout.fillWidth: true
-                    font.pixelSize: 13
-                    color: "#2C3E50"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: "#1a237e"
                     placeholderTextColor: "#95A5A6"
-                    background: Rectangle { radius: 6; color: "#F7F9FB"; border.color: "#D5DCE3" }
+                    background: Rectangle {
+                        radius: 8
+                        color: "white"
+                        border.color: "#3f51b5"
+                        border.width: 1
+                    }
                 }
 
                 // Комбобокс повтора
@@ -312,40 +418,84 @@ Window {
                     id: recurrenceBox
                     model: ["Без повтора", "Ежедневно", "Еженедельно", "Ежемесячно", "Ежегодно", "По будням"]
                     currentIndex: 0
-                    font.pixelSize: 13
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 36
+                    Layout.preferredHeight: 40
+
+                    background: Rectangle {
+                        radius: 8
+                        color: "white"
+                        border.color: "#3f51b5"
+                        border.width: 1
+                    }
+                    contentItem: Text {
+                        leftPadding: 12
+                        rightPadding: 12
+                        verticalAlignment: Text.AlignVCenter
+                        text: recurrenceBox.currentText
+                        font.pixelSize: 16
+                        font.bold: true
+                        color: "#1a237e"
+                    }
+                    indicator: Canvas {
+                        width: 12
+                        height: 8
+                        contextType: "2d"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: 12
+                        onPaint: {
+                            context.reset();
+                            context.moveTo(0, 0);
+                            context.lineTo(width, 0);
+                            context.lineTo(width / 2, height);
+                            context.closePath();
+                            context.fillStyle = "#3f51b5";
+                            context.fill();
+                        }
+                    }
+
+                    popup: Popup {
+                        y: parent.height + 4
+                        width: parent.width
+                        height: Math.min(250, recurrenceBox.count * 40)
+                        padding: 4
+                        background: Rectangle {
+                            radius: 8
+                            color: "#ffffff"
+                            border.color: "#3f51b5"
+                            border.width: 1
+                        }
+
+                        contentItem: ListView {
+                            clip: true
+                            implicitHeight: height
+                            model: recurrenceBox.popup.visible ? recurrenceBox.delegateModel : null
+                            currentIndex: recurrenceBox.highlightedIndex
+                            ScrollIndicator.vertical: ScrollIndicator {}
+                        }
+                    }
 
                     delegate: ItemDelegate {
                         width: parent.width
+                        height: 40
                         text: modelData
-                        font.pixelSize: 13
-                        highlighted: parent.highlightedIndex === index
+                        font.pixelSize: 14
+                        highlighted: index === recurrenceBox.highlightedIndex
                         background: Rectangle {
-                            color: highlighted ? "#3498DB" : "transparent"
-                            radius: 4
+                            radius: 6
+                            color: highlighted ? "#3f51b5" : "transparent"
                         }
                         contentItem: Text {
                             text: modelData
                             font: parent.font
-                            color: highlighted ? "white" : "#2C3E50"
+                            color: highlighted ? "white" : "#1a237e"
                             verticalAlignment: Text.AlignVCenter
+                            leftPadding: 12
                         }
-                    }
-
-                    background: Rectangle {
-                        radius: 6
-                        color: "#F7F9FB"
-                        border.color: "#D5DCE3"
-                    }
-
-                    indicator: Text {
-                        text: "▼"
-                        font.pixelSize: 10
-                        color: "#7F8C8D"
-                        anchors.right: parent.right
-                        anchors.rightMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            recurrenceBox.currentIndex = index
+                            recurrenceBox.popup.close()
+                        }
                     }
                 }
 
@@ -356,19 +506,21 @@ Window {
                     spacing: 12
                     Item { Layout.fillWidth: true }
 
+                    // Кнопка "Отмена" – красная, отличается от остальных
                     Button {
                         text: "Отмена"
                         Layout.preferredWidth: 130
-                        Layout.preferredHeight: 36
-                        font.pixelSize: 13
+                        Layout.preferredHeight: 40
+                        font.pixelSize: 16
+                        font.bold: true
                         palette {
                             button: "transparent"
-                            buttonText: "#2C3E50"
+                            buttonText: "#e74c3c"   // красный текст
                         }
                         background: Rectangle {
-                            radius: 6
+                            radius: 8
                             color: "transparent"
-                            border.color: "#D5DCE3"
+                            border.color: "#e74c3c"
                             border.width: 1
                         }
                         onClicked: {
@@ -377,17 +529,19 @@ Window {
                         }
                     }
 
+                    // Кнопка "Сохранить" – синяя заливка
                     Button {
                         text: "Сохранить"
                         Layout.preferredWidth: 130
-                        Layout.preferredHeight: 36
-                        font.pixelSize: 13
+                        Layout.preferredHeight: 40
+                        font.pixelSize: 16
+                        font.bold: true
                         palette {
                             button: "#3498DB"
                             buttonText: "#FFFFFF"
                         }
                         background: Rectangle {
-                            radius: 6
+                            radius: 8
                             color: parent.palette.button
                         }
                         onClicked: accept()
@@ -400,9 +554,14 @@ Window {
 
     function accept() {
         var quadIndex = quadrantBox.currentIndex - 1
-        var dateStr = selectedDate.toISOString().split('T')[0]
-        var timeStr = timeField.text + ":00"
-        var deadlineStr = dateStr + "T" + timeStr
+
+        // Формируем локальную дату, избегая сдвига UTC
+        var year = selectedDate.getFullYear();
+        var month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
+        var day = ("0" + selectedDate.getDate()).slice(-2);
+        var dateStr = year + "-" + month + "-" + day;
+        var timeStr = timeField.text + ":00";
+        var deadlineStr = dateStr + "T" + timeStr;   // "yyyy-MM-ddTHH:mm:ss"
 
         let taskObj = {
             title: titleField.text,
@@ -429,6 +588,7 @@ Window {
             editingTaskId = task.id;
             titleField.text = task.title || "";
             descField.text = task.description || "";
+
             var q = task.quadrant !== undefined ? task.quadrant : -1;
             quadrantBox.currentIndex = q + 1;
 
@@ -456,9 +616,11 @@ Window {
 
             tagsField.text = task.tags ? task.tags.join(", ") : "";
             projectField.text = task.project || "";
+
             var rules = ["", "daily", "weekly", "monthly", "yearly", "weekdays"];
             var idx = rules.indexOf(task.recurrenceRule || "");
             recurrenceBox.currentIndex = idx >= 0 ? idx : 0;
+
             taskDialog.show();
         }
     }

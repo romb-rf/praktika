@@ -3,7 +3,7 @@
 
 Task::Task()
     : id(QUuid::createUuid().toString(QUuid::WithoutBraces))
-    , createdAt(QDateTime::currentDateTimeUtc())  // сохраняем в UTC
+    , createdAt(QDateTime::currentDateTime())   // локальное время
 {
 }
 
@@ -16,8 +16,9 @@ QJsonObject Task::toJson() const {
     obj["id"] = id;
     obj["title"] = title;
     obj["description"] = description;
-    obj["deadline"] = deadline.isValid() ? deadline.toUTC().toString(Qt::ISODateWithMs) : QString();
-    obj["createdAt"] = createdAt.toUTC().toString(Qt::ISODateWithMs);
+    // Сохраняем дедлайн как локальное время в формате без миллисекунд и без часового пояса
+    obj["deadline"] = deadline.isValid() ? deadline.toString("yyyy-MM-ddTHH:mm:ss") : QString();
+    obj["createdAt"] = createdAt.isValid() ? createdAt.toString("yyyy-MM-ddTHH:mm:ss") : QString();
     obj["quadrant"] = quadrant;
     obj["completed"] = completed;
     obj["tags"] = QJsonArray::fromStringList(tags);
@@ -28,7 +29,6 @@ QJsonObject Task::toJson() const {
 
 Task Task::fromJson(const QJsonObject &json) {
     Task task;
-    // ID: используем существующий, иначе генерируем новый
     task.id = json.value("id").toString();
     if (task.id.isEmpty())
         task.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -37,10 +37,11 @@ Task Task::fromJson(const QJsonObject &json) {
     task.description = json.value("description").toString();
 
     QString ds = json.value("deadline").toString();
-    task.deadline = ds.isEmpty() ? QDateTime() : QDateTime::fromString(ds, Qt::ISODateWithMs);
+    // Парсим локальное время без миллисекунд (формат совпадает с toJson)
+    task.deadline = ds.isEmpty() ? QDateTime() : QDateTime::fromString(ds, "yyyy-MM-ddTHH:mm:ss");
 
     QString cs = json.value("createdAt").toString();
-    task.createdAt = cs.isEmpty() ? QDateTime::currentDateTimeUtc() : QDateTime::fromString(cs, Qt::ISODateWithMs);
+    task.createdAt = cs.isEmpty() ? QDateTime::currentDateTime() : QDateTime::fromString(cs, "yyyy-MM-ddTHH:mm:ss");
 
     task.quadrant = json.value("quadrant").toInt(0);
     task.completed = json.value("completed").toBool(false);

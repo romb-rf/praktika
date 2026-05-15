@@ -9,14 +9,19 @@ Item {
     signal taskClicked(var task)
     signal removeTask(string taskId)
 
-    height: 62
+    height: 70
+
+    // При завершении карточка становится полупрозрачной
+    opacity: taskData.completed ? 0.7 : 1.0
+
     Rectangle {
         anchors.fill: parent
         anchors.margins: 2
         color: "#FFFFFF"
         radius: 6
         border.color: "#F0F0F0"
-        // лёгкая тень через дополнительный прямоугольник
+
+        // Лёгкая тень
         Rectangle {
             anchors.fill: parent
             anchors.margins: -1
@@ -32,46 +37,68 @@ Item {
             anchors.margins: 10
             spacing: 8
 
+            // Чекбокс выполнения
             CheckBox {
                 checked: taskData.completed || false
                 onToggled: TaskManager.toggleComplete(taskData.id)
                 palette { accent: "#3498DB" }
             }
 
+            // Основной контент
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 1
+                spacing: 2
 
-                Text {
-                    text: taskData.title || "Без названия"
-                    font.pixelSize: 14
-                    font.family: "Segoe UI"
-                    font.strikeout: taskData.completed
-                    color: taskData.completed ? "#95A5A6" : "#2C3E50"
-                    elide: Text.ElideRight
+                // Строка с названием и дедлайном
+                RowLayout {
+                    spacing: 8
                     Layout.fillWidth: true
-                }
 
-                Text {
-                    text: {
-                        var desc = taskData.description || ""
-                        desc.length > 60 ? desc.substring(0, 60) + "..." : desc
+                    // Название задачи
+                    Text {
+                        text: taskData.title || "Без названия"
+                        font.pixelSize: 14
+                        font.family: "Segoe UI"
+                        font.strikeout: taskData.completed
+                        color: taskData.completed ? "#95A5A6" : "#2C3E50"
+                        elide: Text.ElideRight
+                        Layout.fillWidth: true
+                        maximumLineCount: 2
+                        wrapMode: Text.WordWrap
                     }
-                    font.pixelSize: 12
-                    font.family: "Segoe UI"
-                    color: "#7F8C8D"
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
-                    visible: text.length > 0
+
+                    // Дедлайн (при завершении серый)
+                    Text {
+                        text: {
+                            if (!taskData.deadline) return ""
+                            var d = new Date(taskData.deadline)
+                            if (isNaN(d.getTime())) return ""
+                            return "⏰ " + d.toLocaleDateString(Qt.locale(), "dd MMM yyyy") + " " +
+                                   d.getHours().toString().padStart(2, '0') + ":" +
+                                   d.getMinutes().toString().padStart(2, '0')
+                        }
+                        font.pixelSize: 11
+                        font.family: "Segoe UI"
+                        font.strikeout: taskData.completed
+                        color: taskData.completed ? "#95A5A6" : "#E74C3C"
+                        elide: Text.ElideRight
+                        Layout.maximumWidth: 200
+                        visible: text.length > 0
+                    }
                 }
 
+                // Строка с тегами и проектом
                 Row {
                     spacing: 3
-                    visible: taskData.tags && taskData.tags.length > 0
+                    visible: (taskData.tags && taskData.tags.length > 0) || (taskData.project && taskData.project.length > 0)
+                    Layout.fillWidth: true
+
+                    // Теги
                     Repeater {
                         model: taskData.tags
                         delegate: Rectangle {
-                            color: "#E8F0FE"
+                            // При завершении делаем фон тега более бледным
+                            color: taskData.completed ? "#D0D8E4" : "#E8F0FE"
                             radius: 4
                             width: tagText.width + 8
                             height: 16
@@ -80,14 +107,28 @@ Item {
                                 text: modelData
                                 font.pixelSize: 10
                                 font.family: "Segoe UI"
-                                color: "#2C3E50"
+                                font.strikeout: taskData.completed
+                                color: taskData.completed ? "#95A5A6" : "#2C3E50"
                                 anchors.centerIn: parent
                             }
                         }
                     }
+
+                    // Проект (серый/ещё серее)
+                    Text {
+                        text: taskData.project || ""
+                        font.pixelSize: 11
+                        font.family: "Segoe UI"
+                        font.strikeout: taskData.completed
+                        color: taskData.completed ? "#95A5A6" : "#7F8C8D"
+                        elide: Text.ElideRight
+                        Layout.fillWidth: true
+                        visible: text.length > 0
+                    }
                 }
             }
 
+            // Кнопка удаления
             Button {
                 text: "🗑"
                 flat: true
@@ -96,14 +137,13 @@ Item {
                 palette { buttonText: "#E74C3C" }
                 background: null
             }
+        }
 
-        } // Конец RowLayout
-
-        // Клик для редактирования (вынесен из RowLayout)
+        // Клик для редактирования (по всей карточке)
         MouseArea {
             anchors.fill: parent
             onClicked: taskClicked(taskData)
             z: -1
         }
-    } // Конец Rectangle
-} // Конец Item
+    }
+}
