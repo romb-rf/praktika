@@ -199,6 +199,79 @@ QJsonArray TaskManager::inboxTasks() const {
     return result;
 }
 
+QJsonArray TaskManager::tasksForQuadrantAndPeriod(int quadrant, const QString &period) const {
+    // Сначала фильтруем по квадранту и поиску (как в tasksForQuadrant)
+    auto filtered = m_tasks | std::views::filter([quadrant, this](const Task &t) {
+                        if (t.quadrant != quadrant) return false;
+                        if (!m_searchQuery.isEmpty()) {
+                            bool matches = t.title.contains(m_searchQuery, Qt::CaseInsensitive)
+                            || t.description.contains(m_searchQuery, Qt::CaseInsensitive);
+                            if (!matches) {
+                                for (const auto &tag : t.tags)
+                                    if (tag.contains(m_searchQuery, Qt::CaseInsensitive)) {
+                                        matches = true;
+                                        break;
+                                    }
+                            }
+                            if (!matches) return false;
+                        }
+                        return true;
+                    });
+
+    QDate today = QDate::currentDate();
+
+    // Фильтрация по периоду
+    std::vector<Task> periodFiltered;
+    if (period == "all") {
+        // Без фильтра даты
+        for (const auto &t : filtered)
+            periodFiltered.push_back(t);
+    } else if (period == "day") {
+        for (const auto &t : filtered) {
+            if (!t.deadline.isValid()) continue;
+            if (t.deadline.date() == today)
+                periodFiltered.push_back(t);
+        }
+    } else if (period == "week") {
+        // Пн-Вс текущей недели (Qt: понедельник = 1)
+        QDate monday = today.addDays(1 - today.dayOfWeek());
+        QDate sunday = monday.addDays(6);
+        for (const auto &t : filtered) {
+            if (!t.deadline.isValid()) continue;
+            if (t.deadline.date() >= monday && t.deadline.date() <= sunday)
+                periodFiltered.push_back(t);
+        }
+    } else if (period == "month") {
+        QDate firstDay(today.year(), today.month(), 1);
+        QDate lastDay = firstDay.addMonths(1).addDays(-1);
+        for (const auto &t : filtered) {
+            if (!t.deadline.isValid()) continue;
+            if (t.deadline.date() >= firstDay && t.deadline.date() <= lastDay)
+                periodFiltered.push_back(t);
+        }
+    } else if (period == "quarter") {
+        int quarter = (today.month() - 1) / 3;
+        QDate firstDay(today.year(), quarter * 3 + 1, 1);
+        QDate lastDay = firstDay.addMonths(3).addDays(-1);
+        for (const auto &t : filtered) {
+            if (!t.deadline.isValid()) continue;
+            if (t.deadline.date() >= firstDay && t.deadline.date() <= lastDay)
+                periodFiltered.push_back(t);
+        }
+    }
+
+    // Сортировка по дедлайну (как обычно)
+    std::ranges::sort(periodFiltered, [](const Task &a, const Task &b) {
+        if (!a.deadline.isValid()) return false;
+        if (!b.deadline.isValid()) return true;
+        return a.deadline < b.deadline;
+    });
+
+    QJsonArray result;
+    for (const auto &t : periodFiltered)
+        result.append(t.toJson());
+    return result;
+}
 
 int TaskManager::dialogX() const {
     QSettings settings("EisenNotion", "EisenNotion");

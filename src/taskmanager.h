@@ -23,6 +23,7 @@ public:
     Q_INVOKABLE QJsonArray inboxTasks() const;
     Q_PROPERTY(int dialogX READ dialogX WRITE setDialogX NOTIFY dialogPositionChanged)
     Q_PROPERTY(int dialogY READ dialogY WRITE setDialogY NOTIFY dialogPositionChanged)
+    Q_INVOKABLE QJsonArray tasksForQuadrantAndPeriod(int quadrant, const QString &period) const;
 
     int dialogX() const;
     void setDialogX(int x);
