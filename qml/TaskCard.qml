@@ -73,7 +73,7 @@ Item {
                             if (!taskData.deadline) return ""
                             var d = new Date(taskData.deadline)
                             if (isNaN(d.getTime())) return ""
-                            return "⏰ " + d.toLocaleDateString(Qt.locale(), "dd MMM yyyy") + " " +
+                            return "⏰ " + d.toLocaleDateString(Qt.locale(), "dd MMMM yyyy") + " " +
                                    d.getHours().toString().padStart(2, '0') + ":" +
                                    d.getMinutes().toString().padStart(2, '0')
                         }

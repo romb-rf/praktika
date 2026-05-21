@@ -55,12 +55,13 @@ Window {
             anchors.fill: parent
             spacing: 0
 
-            // Заголовок
+            // Заголовок (переработан)
             Rectangle {
                 Layout.fillWidth: true
                 height: 40
                 radius: 12
                 color: "#F7F9FB"
+                // Обрезаем нижние углы
                 Rectangle {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -69,33 +70,11 @@ Window {
                     color: parent.color
                 }
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 14
-                    anchors.rightMargin: 8
-
-                    Text {
-                        text: editingTaskId ? "Редактировать задачу" : "Новая задача"
-                        font.pixelSize: 15
-                        font.family: "Segoe UI"
-                        color: "#2C3E50"
-                        Layout.fillWidth: true
-                    }
-                    Button {
-                        text: "✕"
-                        flat: true
-                        font.pixelSize: 16
-                        palette { buttonText: "#95A5A6" }
-                        z: 10
-                        onClicked: {
-                            clearFields()
-                            taskDialog.close()
-                        }
-                    }
-                }
-
+                // Фоновая мышиная область для перетаскивания (не доходит до кнопки)
                 MouseArea {
+                    id: headerDragArea
                     anchors.fill: parent
+                    anchors.rightMargin: 35   // оставляем место для крестика
                     property real lastMouseX: 0
                     property real lastMouseY: 0
                     onPressed: {
@@ -108,6 +87,33 @@ Window {
                         taskDialog.x += deltaX
                         taskDialog.y += deltaY
                     }
+                }
+
+                // Кнопка закрытия (поверх всего)
+                Button {
+                    text: "✕"
+                    flat: true
+                    font.pixelSize: 16
+                    palette { buttonText: "#95A5A6" }
+                    z: 100   // выше всех
+                    anchors.right: parent.right
+                    anchors.rightMargin: 6
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked: {
+                        clearFields()
+                        taskDialog.close()
+                    }
+                }
+
+                // Название окна (просто текст, не кликабельный)
+                Text {
+                    text: editingTaskId ? "Редактировать задачу" : "Новая задача"
+                    font.pixelSize: 15
+                    font.family: "Segoe UI"
+                    color: "#2C3E50"
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 14
                 }
             }
 

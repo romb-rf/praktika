@@ -25,11 +25,16 @@ set(QML_FILES
     qml/TaskCard.qml
     qml/TaskDialog.qml
     qml/InboxTaskCard.qml
+    qml/CalendarView.qml
 )
 
 qt_add_executable(EisenNotion
     src/main.cpp
     ${CORE_SOURCES}
+    qml/CalendarView.qml
+
+
+
 
 
 

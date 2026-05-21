@@ -273,6 +273,28 @@ QJsonArray TaskManager::tasksForQuadrantAndPeriod(int quadrant, const QString &p
     return result;
 }
 
+QJsonArray TaskManager::tasksForRange(const QString &from, const QString &to) const {
+    QDate fromDate = QDate::fromString(from, Qt::ISODate);
+    QDate toDate = QDate::fromString(to, Qt::ISODate);
+    if (!fromDate.isValid() || !toDate.isValid())
+        return {};
+
+    auto filtered = m_tasks | std::views::filter([fromDate, toDate](const Task &t) {
+                        if (!t.deadline.isValid()) return false;
+                        return t.deadline.date() >= fromDate && t.deadline.date() <= toDate;
+                    });
+
+    std::vector<Task> sorted(filtered.begin(), filtered.end());
+    std::ranges::sort(sorted, [](const Task &a, const Task &b) {
+        return a.deadline < b.deadline;
+    });
+
+    QJsonArray result;
+    for (const auto &t : sorted)
+        result.append(t.toJson());
+    return result;
+}
+
 int TaskManager::dialogX() const {
     QSettings settings("EisenNotion", "EisenNotion");
     return settings.value("dialogX", -1).toInt(); // -1 значит "не задано"

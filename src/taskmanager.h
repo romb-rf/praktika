@@ -24,6 +24,7 @@ public:
     Q_PROPERTY(int dialogX READ dialogX WRITE setDialogX NOTIFY dialogPositionChanged)
     Q_PROPERTY(int dialogY READ dialogY WRITE setDialogY NOTIFY dialogPositionChanged)
     Q_INVOKABLE QJsonArray tasksForQuadrantAndPeriod(int quadrant, const QString &period) const;
+    Q_INVOKABLE QJsonArray tasksForRange(const QString &from, const QString &to) const;
 
     int dialogX() const;
     void setDialogX(int x);
