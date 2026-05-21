@@ -1,4 +1,4 @@
-#pragma once
+// #pragma once
 #include <QObject>
 #include <QVector>
 #include <QTimer>
@@ -6,6 +6,7 @@
 #include "jsonstorage.h"
 #include <QSoundEffect>
 #include <QCoreApplication>
+
 class TaskManager : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
@@ -30,7 +31,7 @@ public:
     Q_INVOKABLE QJsonArray calendarModel(const QString &period, const QString &currentISODate) const;
     Q_PROPERTY(int pomodoroWorkDuration READ pomodoroWorkDuration WRITE setPomodoroWorkDuration NOTIFY pomodoroSettingsChanged)
     Q_PROPERTY(int pomodoroBreakDuration READ pomodoroBreakDuration WRITE setPomodoroBreakDuration NOTIFY pomodoroSettingsChanged)
-    Q_INVOKABLE void playNotificationSound();
+    // Q_INVOKABLE void playNotificationSound();
     int pomodoroWorkDuration() const;
     void setPomodoroWorkDuration(int minutes);
     int pomodoroBreakDuration() const;

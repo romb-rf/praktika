@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import EisenNotion 1.0
-
+import QtMultimedia
 Window {
     id: pomodoroWindow
     width: 500
@@ -20,34 +20,43 @@ Window {
     property int workDuration: TaskManager.pomodoroWorkDuration
     property int breakDuration: TaskManager.pomodoroBreakDuration
     property int totalSeconds: onBreak ? breakDuration * 60 : workDuration * 60
-
+    MediaPlayer {
+            id: mediaPlayer
+            source: "qrc:/sounds/bell.wav"
+            audioOutput: AudioOutput {
+                volume: 0.8
+            }
+    }
     Timer {
         id: countdownTimer
         interval: 1000
         repeat: true
         running: pomodoroWindow.running && pomodoroWindow.remainingSeconds > 0
         onTriggered: {
-            pomodoroWindow.remainingSeconds--;
-            if (pomodoroWindow.remainingSeconds <= 0) {
-                TaskManager.playNotificationSound();
-                var msg = pomodoroWindow.onBreak ? "Отдых завершён! Начинаем работу." : "Работа завершена! Время отдыха.";
-                var comp = Qt.createComponent("qrc:/qml/NotificationPopup.qml");
-                if (comp.status === Component.Ready) {
-                    var popup = comp.createObject(pomodoroWindow, {"message": msg, "parentWindow": pomodoroWindow});
-                    popup.show();
-                }
-                if (pomodoroWindow.onBreak) {
-                    pomodoroWindow.onBreak = false;
-                    pomodoroWindow.totalSeconds = pomodoroWindow.workDuration * 60;
-                } else {
-                    pomodoroWindow.onBreak = true;
-                    pomodoroWindow.totalSeconds = pomodoroWindow.breakDuration * 60;
-                }
-                pomodoroWindow.remainingSeconds = pomodoroWindow.totalSeconds;
-                pomodoroWindow.running = true;
-            }
+                   pomodoroWindow.remainingSeconds--;
+                   if (pomodoroWindow.remainingSeconds <= 0) {
+                       // Останавливаем таймер
+                       // pomodoroWindow.running = false;
+                       // Звук
+                       if (mediaPlayer.status === MediaPlayer.Loaded) {
+                           mediaPlayer.stop();
+                           mediaPlayer.play();
+                       }
+                       // Уведомление
+                       var msg = pomodoroWindow.onBreak ? "Отдых завершён! Можно начинать работу." : "Работа завершена! Время отдыха.";
+                       var comp = Qt.createComponent("qrc:/qml/NotificationPopup.qml");
+                       if (comp.status === Component.Ready) {
+                           var popup = comp.createObject(pomodoroWindow, {"message": msg, "parentWindow": pomodoroWindow});
+                           popup.show();
+                       }
+                       pomodoroWindow.onBreak = !pomodoroWindow.onBreak;
+                                       var newTotal = pomodoroWindow.onBreak ? pomodoroWindow.breakDuration * 60 : pomodoroWindow.workDuration * 60;
+                                       pomodoroWindow.remainingSeconds = newTotal;
+                       // Не переключаем режим автоматически, ждём действия пользователя
+                   }
+               }
         }
-    }
+
 
     Component.onCompleted: {
         var savedX = TaskManager.dialogX
