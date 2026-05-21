@@ -64,14 +64,6 @@ Item {
             TaskManager.removeTask(taskData.id);
         }
     }
-    Button {
-        text: "🍅"
-        flat: true
-        font.pixelSize: 14
-        palette { buttonText: "#E74C3C" }
-        background: null
-        onClicked: pomodoroWindow.startWithTask(taskData)
-    }
 
     MouseArea {
         id: dragArea

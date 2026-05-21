@@ -5,8 +5,8 @@ import EisenNotion 1.0
 
 Window {
     id: pomodoroWindow
-    width: 360
-    height: 280
+    width: 500
+    height: 400
     color: "transparent"
     flags: Qt.Dialog | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     modality: Qt.NonModal
@@ -17,12 +17,10 @@ Window {
     property bool running: false
     property bool onBreak: false
 
-    // Длительности только из C++ (настраиваются в другом месте)
     property int workDuration: TaskManager.pomodoroWorkDuration
     property int breakDuration: TaskManager.pomodoroBreakDuration
     property int totalSeconds: onBreak ? breakDuration * 60 : workDuration * 60
 
-    // Таймер
     Timer {
         id: countdownTimer
         interval: 1000
@@ -31,7 +29,6 @@ Window {
         onTriggered: {
             pomodoroWindow.remainingSeconds--;
             if (pomodoroWindow.remainingSeconds <= 0) {
-                // Звук и уведомление
                 TaskManager.playNotificationSound();
                 var msg = pomodoroWindow.onBreak ? "Отдых завершён! Начинаем работу." : "Работа завершена! Время отдыха.";
                 var comp = Qt.createComponent("qrc:/qml/NotificationPopup.qml");
@@ -39,7 +36,6 @@ Window {
                     var popup = comp.createObject(pomodoroWindow, {"message": msg, "parentWindow": pomodoroWindow});
                     popup.show();
                 }
-                // Автопереключение режима
                 if (pomodoroWindow.onBreak) {
                     pomodoroWindow.onBreak = false;
                     pomodoroWindow.totalSeconds = pomodoroWindow.workDuration * 60;
@@ -201,6 +197,150 @@ Window {
                     font.bold: true
                     color: onBreak ? "#2ECC71" : "#E74C3C"
                     Layout.alignment: Qt.AlignHCenter
+                }
+
+                // Настройки длительности с кнопками – и +
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    Text {
+                        text: "Работа (мин):"
+                        font.pixelSize: 13
+                        font.family: "Segoe UI"
+                        font.bold: true
+                        color: "#1a237e"
+                    }
+
+                    Button {
+                        text: "–"
+                        font.pixelSize: 14
+                        font.bold: true
+                        palette { buttonText: "#1a237e" }
+                        background: Rectangle {
+                            radius: 6
+                            color: "transparent"
+                            border.color: "#3f51b5"
+                            border.width: 1
+                        }
+                        implicitWidth: 30
+                        implicitHeight: 30
+                        onClicked: {
+                            if (workDuration > 1) {
+                                workDuration--;
+                                TaskManager.pomodoroWorkDuration = workDuration;
+                                if (!onBreak && !running) {
+                                    totalSeconds = workDuration * 60;
+                                    remainingSeconds = 0;
+                                }
+                            }
+                        }
+                    }
+
+                    Text {
+                        text: workDuration
+                        font.pixelSize: 14
+                        font.family: "Segoe UI"
+                        font.bold: true
+                        color: "#1a237e"
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.preferredWidth: 40
+                    }
+
+                    Button {
+                        text: "+"
+                        font.pixelSize: 14
+                        font.bold: true
+                        palette { buttonText: "#1a237e" }
+                        background: Rectangle {
+                            radius: 6
+                            color: "transparent"
+                            border.color: "#3f51b5"
+                            border.width: 1
+                        }
+                        implicitWidth: 30
+                        implicitHeight: 30
+                        onClicked: {
+                            if (workDuration < 120) {
+                                workDuration++;
+                                TaskManager.pomodoroWorkDuration = workDuration;
+                                if (!onBreak && !running) {
+                                    totalSeconds = workDuration * 60;
+                                    remainingSeconds = 0;
+                                }
+                            }
+                        }
+                    }
+
+                    Item { Layout.fillWidth: true }
+
+                    Text {
+                        text: "Отдых (мин):"
+                        font.pixelSize: 13
+                        font.family: "Segoe UI"
+                        font.bold: true
+                        color: "#1a237e"
+                    }
+
+                    Button {
+                        text: "–"
+                        font.pixelSize: 14
+                        font.bold: true
+                        palette { buttonText: "#1a237e" }
+                        background: Rectangle {
+                            radius: 6
+                            color: "transparent"
+                            border.color: "#3f51b5"
+                            border.width: 1
+                        }
+                        implicitWidth: 30
+                        implicitHeight: 30
+                        onClicked: {
+                            if (breakDuration > 1) {
+                                breakDuration--;
+                                TaskManager.pomodoroBreakDuration = breakDuration;
+                                if (onBreak && !running) {
+                                    totalSeconds = breakDuration * 60;
+                                    remainingSeconds = 0;
+                                }
+                            }
+                        }
+                    }
+
+                    Text {
+                        text: breakDuration
+                        font.pixelSize: 14
+                        font.family: "Segoe UI"
+                        font.bold: true
+                        color: "#1a237e"
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.preferredWidth: 40
+                    }
+
+                    Button {
+                        text: "+"
+                        font.pixelSize: 14
+                        font.bold: true
+                        palette { buttonText: "#1a237e" }
+                        background: Rectangle {
+                            radius: 6
+                            color: "transparent"
+                            border.color: "#3f51b5"
+                            border.width: 1
+                        }
+                        implicitWidth: 30
+                        implicitHeight: 30
+                        onClicked: {
+                            if (breakDuration < 60) {
+                                breakDuration++;
+                                TaskManager.pomodoroBreakDuration = breakDuration;
+                                if (onBreak && !running) {
+                                    totalSeconds = breakDuration * 60;
+                                    remainingSeconds = 0;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Кнопки управления

@@ -15,7 +15,7 @@ TaskManager* TaskManager::instance() {
 TaskManager::TaskManager(QObject *parent) : QObject(parent) {
     loadFromDisk();
     m_notificationSound = new QSoundEffect(this);
-    m_notificationSound->setSource(QUrl("qrc:/sounds/bell.wav"));
+    m_notificationSound->setSource(QUrl("Resources:/sounds/bell.wav"));
     m_notificationSound->setVolume(0.8);
     // Если файл не загрузился, статус останется Error, будем использовать beep
     m_saveTimer.setSingleShot(true);
