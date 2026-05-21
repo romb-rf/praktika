@@ -24,6 +24,7 @@ Item {
         spacing: 6
 
         // Верхняя панель с выбором периода
+        // Верхняя панель с выбором периода
         Rectangle {
             Layout.fillWidth: true
             height: 40
@@ -37,11 +38,12 @@ Item {
                 Text {
                     text: "Показать задачи за:"
                     font.pixelSize: 14
+                    font.bold: true
                     font.family: "Segoe UI"
-                    color: "#2C3E50"
+                    color: "#1a237e"
                 }
 
-                // Комбобокс в стиле TaskDialog
+                // Комбобокс в том же стиле, что и в TaskDialog
                 ComboBox {
                     id: periodBox
                     model: ["Все", "День", "Неделя", "Месяц", "Квартал"]
@@ -62,6 +64,7 @@ Item {
                         text: periodBox.currentText
                         font.pixelSize: 14
                         font.bold: true
+                        font.family: "Segoe UI"
                         color: "#1a237e"
                     }
                     indicator: Canvas {
@@ -105,6 +108,7 @@ Item {
                         height: 40
                         text: modelData
                         font.pixelSize: 14
+                        font.family: "Segoe UI"
                         highlighted: index === periodBox.highlightedIndex
                         background: Rectangle {
                             radius: 6

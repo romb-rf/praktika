@@ -5,6 +5,8 @@
 #include <vector>
 #include <QDebug>
 #include <QSettings>
+#include <QSoundEffect>
+#include <QCoreApplication>
 TaskManager* TaskManager::instance() {
     static TaskManager* inst = new TaskManager(QCoreApplication::instance());
     return inst;
@@ -12,6 +14,10 @@ TaskManager* TaskManager::instance() {
 
 TaskManager::TaskManager(QObject *parent) : QObject(parent) {
     loadFromDisk();
+    m_notificationSound = new QSoundEffect(this);
+    m_notificationSound->setSource(QUrl("qrc:/sounds/bell.wav"));
+    m_notificationSound->setVolume(0.8);
+    // Если файл не загрузился, статус останется Error, будем использовать beep
     m_saveTimer.setSingleShot(true);
     m_saveTimer.setInterval(200);
     connect(&m_saveTimer, &QTimer::timeout, this, &TaskManager::saveToDisk);
@@ -295,87 +301,6 @@ QJsonArray TaskManager::tasksForRange(const QString &from, const QString &to) co
     return result;
 }
 
-// QJsonArray TaskManager::calendarModel(const QString &period) const {
-//     QDate today = QDate::currentDate();
-//     QDate start, end;
-//     int totalCells = 0;
-
-//     if (period == "week") {
-//         // Понедельник текущей недели
-//         int dayOfWeek = today.dayOfWeek(); // 1 = понедельник, 7 = воскресенье
-//         start = today.addDays(1 - dayOfWeek);
-//         end = start.addDays(6);
-//         totalCells = 7;
-//     } else if (period == "month") {
-//         start = QDate(today.year(), today.month(), 1);
-//         end = start.addMonths(1).addDays(-1);
-//         int startOffset = start.dayOfWeek() - 1; // 0 = пн, ..., 6 = вс
-//         int daysInMonth = start.daysInMonth();
-//         totalCells = startOffset + daysInMonth;
-//         // Дополним до кратности 7, чтобы строки были полными
-//         while (totalCells % 7 != 0) totalCells++;
-//     } else {
-//         return {};
-//     }
-
-//     // Соберём все задачи диапазона (без фильтра поиска, чтобы в календаре показывались все)
-//     QVector<Task> rangeTasks;
-//     for (const auto &task : m_tasks) {
-//         if (task.deadline.isValid() && task.deadline.date() >= start && task.deadline.date() <= end) {
-//             rangeTasks.append(task);
-//         }
-//     }
-
-//     QJsonArray cells;
-//     for (int i = 0; i < totalCells; ++i) {
-//         QJsonObject cell;
-//         if (period == "week") {
-//             QDate cellDate = start.addDays(i);
-//             cell["day"] = cellDate.day();
-//             cell["dateStr"] = cellDate.toString(Qt::ISODate);
-//             cell["isToday"] = (cellDate == today);
-
-//             QJsonArray tasksForDay;
-//             for (const auto &task : rangeTasks) {
-//                 if (task.deadline.date() == cellDate) {
-//                     tasksForDay.append(task.toJson());
-//                 }
-//             }
-//             cell["tasks"] = tasksForDay;
-//         } else { // month
-//             int startOffset = start.dayOfWeek() - 1;
-//             if (i < startOffset) {
-//                 cell["day"] = 0; // пустая ячейка
-//                 cell["dateStr"] = "";
-//                 cell["isToday"] = false;
-//                 cell["tasks"] = QJsonArray();
-//             } else {
-//                 int dayNumber = i - startOffset + 1;
-//                 if (dayNumber <= end.day()) {
-//                     QDate cellDate(start.year(), start.month(), dayNumber);
-//                     cell["day"] = dayNumber;
-//                     cell["dateStr"] = cellDate.toString(Qt::ISODate);
-//                     cell["isToday"] = (cellDate == today);
-
-//                     QJsonArray tasksForDay;
-//                     for (const auto &task : rangeTasks) {
-//                         if (task.deadline.date() == cellDate) {
-//                             tasksForDay.append(task.toJson());
-//                         }
-//                     }
-//                     cell["tasks"] = tasksForDay;
-//                 } else {
-//                     cell["day"] = 0;
-//                     cell["dateStr"] = "";
-//                     cell["isToday"] = false;
-//                     cell["tasks"] = QJsonArray();
-//                 }
-//             }
-//         }
-//         cells.append(cell);
-//     }
-//     return cells;
-// }
 QJsonArray TaskManager::calendarModel(const QString &period, const QString &currentISODate) const {
     QDate refDate = QDate::fromString(currentISODate, Qt::ISODate);
     if (!refDate.isValid()) refDate = QDate::currentDate();
@@ -471,4 +396,28 @@ void TaskManager::setDialogY(int y) {
     QSettings settings("EisenNotion", "EisenNotion");
     settings.setValue("dialogY", y);
     emit dialogPositionChanged();
+}
+
+int TaskManager::pomodoroWorkDuration() const {
+    QSettings settings("EisenNotion", "EisenNotion");
+    return settings.value("pomodoroWorkDuration", 1).toInt();
+}
+void TaskManager::setPomodoroWorkDuration(int minutes) {
+    QSettings settings("EisenNotion", "EisenNotion");
+    settings.setValue("pomodoroWorkDuration", minutes);
+    emit pomodoroSettingsChanged();
+}
+int TaskManager::pomodoroBreakDuration() const {
+    QSettings settings("EisenNotion", "EisenNotion");
+    return settings.value("pomodoroBreakDuration", 5).toInt();
+}
+void TaskManager::setPomodoroBreakDuration(int minutes) {
+    QSettings settings("EisenNotion", "EisenNotion");
+    settings.setValue("pomodoroBreakDuration", minutes);
+    emit pomodoroSettingsChanged();
+}
+void TaskManager::playNotificationSound() {
+    if (m_notificationSound && m_notificationSound->status() == QSoundEffect::Ready) {
+        m_notificationSound->play();
+    }
 }

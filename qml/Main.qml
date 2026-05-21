@@ -59,31 +59,37 @@ ApplicationWindow {
                         spacing: 12
 
                         Button {
-                            text: "＋ Новая задача"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 40
-                            font.pixelSize: 13
-                            palette {
-                                button: "#3498DB"
-                                buttonText: "#FFFFFF"
-                            }
-                            background: Rectangle {
-                                color: parent.palette.button
-                                radius: 6
-                            }
-                            onClicked: {
-                                taskDialog.editingTaskId = ""
-                                taskDialog.show()
-                            }
-                        }
+                                                    text: "＋ Новая задача"
+                                                    Layout.fillWidth: true
+                                                    Layout.preferredHeight: 40
+                                                    font.pixelSize: 16
+                                                    font.bold: true
+                                                    font.family: "Segoe UI"
+                                                    palette {
+                                                        button: "#3498DB"
+                                                        buttonText: "#FFFFFF"
+                                                    }
+                                                    background: Rectangle {
+                                                        color: parent.palette.button
+                                                        radius: 6
+                                                    }
+                                                    onClicked: {
+                                                        taskDialog.editingTaskId = ""
+                                                        taskDialog.show()
+                                                    }
+                                                }
 
-                        Button {
-                            text: "📅 Календарь"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 36
-                            font.pixelSize: 13
-                            onClicked: rightPanelStack.currentIndex = 1
-                        }
+                                                Button {
+                                                    text: "📅 Календарь"
+                                                    Layout.fillWidth: true
+                                                    Layout.preferredHeight: 40
+                                                    font.pixelSize: 16
+                                                    font.bold: true
+                                                    font.family: "Segoe UI"
+                                                    flat: true
+                                                    palette { buttonText: "#1a237e" }
+                                                    onClicked: rightPanelStack.currentIndex = 1
+                                                }
 
                         TextField {
                             id: searchField
@@ -121,23 +127,23 @@ ApplicationWindow {
                         }
 
                         ListView {
-                            id: inboxList
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            clip: true
-                            spacing: 4
-                            model: []
-                            delegate: InboxTaskCard {
-                                width: inboxList.width
-                                taskData: modelData
-                            }
-                            add: Transition {
-                                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: 200 }
-                            }
-                            remove: Transition {
-                                NumberAnimation { properties: "opacity"; to: 0; duration: 150 }
-                            }
-                        }
+                                            id: inboxList
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            clip: true
+                                            spacing: 4
+                                            model: []
+                                            delegate: InboxTaskCard {
+                                                width: inboxList.width
+                                                taskData: modelData
+                                            }
+                                            add: Transition {
+                                                NumberAnimation { properties: "opacity"; from: 0; to: 1; duration: 200 }
+                                            }
+                                            remove: Transition {
+                                                NumberAnimation { properties: "opacity"; to: 0; duration: 150 }
+                                            }
+                                        }
                     }
                 }
 
@@ -153,10 +159,16 @@ ApplicationWindow {
                         spacing: 4
 
                         Button {
-                            text: "← Входящие"
-                            flat: true
-                            onClicked: rightPanelStack.currentIndex = 0
-                        }
+                                                    text: "← Входящие"
+                                                    Layout.fillWidth: true
+                                                    Layout.preferredHeight: 40
+                                                    font.pixelSize: 16
+                                                    font.bold: true
+                                                    font.family: "Segoe UI"
+                                                    flat: true
+                                                    palette { buttonText: "#1a237e" }
+                                                    onClicked: rightPanelStack.currentIndex = 0
+                                                }
 
                         CalendarView {
                             Layout.fillWidth: true
@@ -184,4 +196,7 @@ ApplicationWindow {
     TaskDialog {
         id: taskDialog
     }
+    PomodoroWindow {
+           id: pomodoroWindow
+       }
 }

@@ -4,7 +4,8 @@
 #include <QTimer>
 #include "task.h"
 #include "jsonstorage.h"
-
+#include <QSoundEffect>
+#include <QCoreApplication>
 class TaskManager : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString searchQuery READ searchQuery WRITE setSearchQuery NOTIFY searchQueryChanged)
@@ -27,6 +28,13 @@ public:
     Q_INVOKABLE QJsonArray tasksForRange(const QString &from, const QString &to) const;
     // Q_INVOKABLE QJsonArray calendarModel(const QString &period) const;
     Q_INVOKABLE QJsonArray calendarModel(const QString &period, const QString &currentISODate) const;
+    Q_PROPERTY(int pomodoroWorkDuration READ pomodoroWorkDuration WRITE setPomodoroWorkDuration NOTIFY pomodoroSettingsChanged)
+    Q_PROPERTY(int pomodoroBreakDuration READ pomodoroBreakDuration WRITE setPomodoroBreakDuration NOTIFY pomodoroSettingsChanged)
+    Q_INVOKABLE void playNotificationSound();
+    int pomodoroWorkDuration() const;
+    void setPomodoroWorkDuration(int minutes);
+    int pomodoroBreakDuration() const;
+    void setPomodoroBreakDuration(int minutes);
 
     int dialogX() const;
     void setDialogX(int x);
@@ -39,6 +47,7 @@ signals:
     void dataChanged();
     void searchQueryChanged();
     void dialogPositionChanged();
+    void pomodoroSettingsChanged();
 
 private slots:
     void saveToDisk();
@@ -52,4 +61,5 @@ private:
     void scheduleSave();
     void loadFromDisk();
     void handleRecurrenceIfNeeded(const Task &completedTask);
+    QSoundEffect* m_notificationSound = nullptr;
 };

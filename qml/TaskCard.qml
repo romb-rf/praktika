@@ -140,6 +140,14 @@ Item {
                 palette { buttonText: "#E74C3C" }
                 background: null
             }
+            Button {
+                text: "🍅"
+                flat: true
+                font.pixelSize: 14
+                palette { buttonText: "#E74C3C" }
+                background: null
+                onClicked: pomodoroWindow.startWithTask(taskData)
+            }
         }
 
         // Клик для редактирования (по всей карточке)

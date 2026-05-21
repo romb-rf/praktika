@@ -8,7 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Quick QuickControls2)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick QuickControls2 Multimedia)
 
 set(CORE_SOURCES
     src/task.h
@@ -26,6 +26,8 @@ set(QML_FILES
     qml/TaskDialog.qml
     qml/InboxTaskCard.qml
     qml/CalendarView.qml
+    qml/PomodoroWindow.qml
+    qml/NotificationPopup.qml
 )
 
 qt_add_executable(EisenNotion
@@ -38,11 +40,14 @@ qt_add_executable(EisenNotion
 
 
 
+
 )
 
 qt_add_resources(EisenNotion "qml_resources"
     PREFIX "/"
     FILES ${QML_FILES}
+    sounds/bell.wav
+
 )
 
 target_link_libraries(EisenNotion PRIVATE
@@ -50,6 +55,7 @@ target_link_libraries(EisenNotion PRIVATE
     Qt6::Quick
     Qt6::QuickControls2
     Qt6::Qml
+    Qt6::Multimedia
 )
 
 target_include_directories(EisenNotion PRIVATE src)

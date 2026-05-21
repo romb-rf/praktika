@@ -46,18 +46,31 @@ Item {
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
-
-            // Кнопка удаления (поверх MouseArea)
-            Button {
-                text: "🗑"
-                flat: true
-                font.pixelSize: 16
-                z: 10
-                onClicked: TaskManager.removeTask(taskData.id)
-                palette { buttonText: "#E74C3C" }
-                background: null
-            }
         }
+    }
+
+    // Кнопка удаления – поверх всего, не перекрывается MouseArea
+    Button {
+        text: "🗑"
+        flat: true
+        font.pixelSize: 16
+        z: 100
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.verticalCenter: parent.verticalCenter
+        palette { buttonText: "#E74C3C" }
+        background: null
+        onClicked: {
+            TaskManager.removeTask(taskData.id);
+        }
+    }
+    Button {
+        text: "🍅"
+        flat: true
+        font.pixelSize: 14
+        palette { buttonText: "#E74C3C" }
+        background: null
+        onClicked: pomodoroWindow.startWithTask(taskData)
     }
 
     MouseArea {
@@ -70,5 +83,11 @@ Item {
             pressY = mouseY
         }
         drag.target: null
+        // При коротком клике (без перетаскивания) открываем редактирование
+        onClicked: {
+            if (Math.abs(mouseX - pressX) < 5 && Math.abs(mouseY - pressY) < 5) {
+                taskDialog.loadTask(taskData);
+            }
+        }
     }
 }
