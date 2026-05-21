@@ -70,13 +70,16 @@ Item {
                     // Дедлайн (при завершении серый)
                     Text {
                         text: {
-                            if (!taskData.deadline) return ""
-                            var d = new Date(taskData.deadline)
-                            if (isNaN(d.getTime())) return ""
-                            return "⏰ " + d.toLocaleDateString(Qt.locale(), "dd MMMM yyyy") + " " +
-                                   d.getHours().toString().padStart(2, '0') + ":" +
-                                   d.getMinutes().toString().padStart(2, '0')
-                        }
+                                                if (!taskData.deadline) return ""
+                                                var d = new Date(taskData.deadline)
+                                                if (isNaN(d.getTime())) return ""
+                                                // Месяцы для карточки
+                                                var months = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня",
+                                                              "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+                                                return "⏰ " + d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear() + " " +
+                                                       d.getHours().toString().padStart(2, '0') + ":" +
+                                                       d.getMinutes().toString().padStart(2, '0')
+                                            }
                         font.pixelSize: 11
                         font.family: "Segoe UI"
                         font.strikeout: taskData.completed

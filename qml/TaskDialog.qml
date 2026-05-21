@@ -6,7 +6,7 @@ import EisenNotion 1.0
 Window {
     id: taskDialog
     width: 480
-    height: 500
+    height: 510
     color: "transparent"
     flags: Qt.Dialog | Qt.FramelessWindowHint
     modality: Qt.ApplicationModal
@@ -15,6 +15,12 @@ Window {
     property date selectedDate: new Date()
     property int currentMonth: selectedDate.getMonth()
     property int currentYear: selectedDate.getFullYear()
+
+    // Статический массив для именительного падежа
+    property var monthNames: [
+        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    ]
 
     function daysInMonth(year, month) { return new Date(year, month + 1, 0).getDate() }
     function firstDayOfWeek(year, month) { return new Date(year, month, 1).getDay() }
@@ -55,13 +61,12 @@ Window {
             anchors.fill: parent
             spacing: 0
 
-            // Заголовок (переработан)
+            // Заголовок
             Rectangle {
                 Layout.fillWidth: true
                 height: 40
                 radius: 12
                 color: "#F7F9FB"
-                // Обрезаем нижние углы
                 Rectangle {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -70,11 +75,10 @@ Window {
                     color: parent.color
                 }
 
-                // Фоновая мышиная область для перетаскивания (не доходит до кнопки)
                 MouseArea {
                     id: headerDragArea
                     anchors.fill: parent
-                    anchors.rightMargin: 35   // оставляем место для крестика
+                    anchors.rightMargin: 35
                     property real lastMouseX: 0
                     property real lastMouseY: 0
                     onPressed: {
@@ -89,13 +93,12 @@ Window {
                     }
                 }
 
-                // Кнопка закрытия (поверх всего)
                 Button {
                     text: "✕"
                     flat: true
                     font.pixelSize: 16
                     palette { buttonText: "#95A5A6" }
-                    z: 100   // выше всех
+                    z: 100
                     anchors.right: parent.right
                     anchors.rightMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
@@ -105,7 +108,6 @@ Window {
                     }
                 }
 
-                // Название окна (просто текст, не кликабельный)
                 Text {
                     text: editingTaskId ? "Редактировать задачу" : "Новая задача"
                     font.pixelSize: 15
@@ -123,7 +125,6 @@ Window {
                 Layout.margins: 16
                 spacing: 14
 
-                // Название задачи
                 TextField {
                     id: titleField
                     placeholderText: "Название задачи"
@@ -140,7 +141,6 @@ Window {
                     }
                 }
 
-                // Описание
                 TextArea {
                     id: descField
                     placeholderText: "Описание (можно Markdown)"
@@ -255,7 +255,7 @@ Window {
 
                     Button {
                         id: dateButton
-                        text: selectedDate.toLocaleDateString(Qt.locale(), "dd.MM.yyyy")
+                        text: selectedDate.getDate() + " " + monthNames[selectedDate.getMonth()].substring(0, 3) + ". " + selectedDate.getFullYear()
                         font.pixelSize: 16
                         font.bold: true
                         palette { buttonText: "#1a237e" }
@@ -288,7 +288,7 @@ Window {
                     }
                 }
 
-                // Календарь
+                // Календарь с маленькими кнопками
                 Popup {
                     id: calendarPopup
                     width: 280
@@ -309,15 +309,49 @@ Window {
                         spacing: 4
                         RowLayout {
                             Layout.fillWidth: true
-                            Button { text: "<"; onClicked: { if (currentMonth === 0) { currentMonth = 11; currentYear-- } else { currentMonth-- } } }
+                            Button {
+                                text: "<"
+                                flat: true
+                                font.pixelSize: 18
+                                palette { buttonText: "#2C3E50" }
+                                background: Rectangle {
+                                    radius: 4
+                                    color: "transparent"
+                                    border.color: "#2C3E50"
+                                    border.width: 1
+                                }
+                                implicitWidth: 30
+                                implicitHeight: 30
+                                onClicked: {
+                                    if (currentMonth === 0) { currentMonth = 11; currentYear-- }
+                                    else { currentMonth-- }
+                                }
+                            }
                             Label {
-                                text: new Date(currentYear, currentMonth).toLocaleDateString(Qt.locale(), "MMMM yyyy")
+                                text: monthNames[currentMonth] + " " + currentYear
                                 font.pixelSize: 14
                                 Layout.fillWidth: true
                                 horizontalAlignment: Text.AlignHCenter
                                 color: "#2C3E50"
                             }
-                            Button { text: ">"; onClicked: { if (currentMonth === 11) { currentMonth = 0; currentYear++ } else { currentMonth++ } } }
+                            Button {
+                                text: ">"
+                                flat: true
+                                font.pixelSize: 18
+                                palette { buttonText: "#2C3E50" }
+                                background: Rectangle {
+                                    radius: 4
+                                    color: "transparent"
+                                    border.color: "#2C3E50"
+                                    border.width: 1
+                                }
+                                implicitWidth: 30
+                                implicitHeight: 30
+                                onClicked: {
+                                    if (currentMonth === 11) { currentMonth = 0; currentYear++ }
+                                    else { currentMonth++ }
+                                }
+                            }
                         }
 
                         GridLayout {
@@ -385,7 +419,6 @@ Window {
                     }
                 }
 
-                // Теги
                 TextField {
                     id: tagsField
                     placeholderText: "Теги через запятую"
@@ -402,7 +435,6 @@ Window {
                     }
                 }
 
-                // Проект
                 TextField {
                     id: projectField
                     placeholderText: "Проект"
@@ -512,7 +544,6 @@ Window {
                     spacing: 12
                     Item { Layout.fillWidth: true }
 
-                    // Кнопка "Отмена" – красная, отличается от остальных
                     Button {
                         text: "Отмена"
                         Layout.preferredWidth: 130
@@ -521,7 +552,7 @@ Window {
                         font.bold: true
                         palette {
                             button: "transparent"
-                            buttonText: "#e74c3c"   // красный текст
+                            buttonText: "#e74c3c"
                         }
                         background: Rectangle {
                             radius: 8
@@ -535,7 +566,6 @@ Window {
                         }
                     }
 
-                    // Кнопка "Сохранить" – синяя заливка
                     Button {
                         text: "Сохранить"
                         Layout.preferredWidth: 130
@@ -558,16 +588,16 @@ Window {
         }
     }
 
+    // Исправленный accept с локальным временем
     function accept() {
         var quadIndex = quadrantBox.currentIndex - 1
 
-        // Формируем локальную дату, избегая сдвига UTC
         var year = selectedDate.getFullYear();
         var month = ("0" + (selectedDate.getMonth() + 1)).slice(-2);
         var day = ("0" + selectedDate.getDate()).slice(-2);
         var dateStr = year + "-" + month + "-" + day;
         var timeStr = timeField.text + ":00";
-        var deadlineStr = dateStr + "T" + timeStr;   // "yyyy-MM-ddTHH:mm:ss"
+        var deadlineStr = dateStr + "T" + timeStr;
 
         let taskObj = {
             title: titleField.text,
@@ -643,5 +673,18 @@ Window {
         tagsField.clear();
         projectField.clear();
         recurrenceBox.currentIndex = 0;
+    }
+
+    // Функция для вызова из календаря
+    function showForDate(date) {
+        clearFields();
+        editingTaskId = "";
+        selectedDate = date;
+        currentMonth = date.getMonth();
+        currentYear = date.getFullYear();
+        var hours = date.getHours().toString().padStart(2, '0');
+        var minutes = date.getMinutes().toString().padStart(2, '0');
+        timeField.text = hours + ":" + minutes;
+        taskDialog.show();
     }
 }
