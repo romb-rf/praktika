@@ -1,5 +1,0 @@
-if(EXISTS "C:/praktika/tests/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/EisenNotion_tests[1]_tests.cmake")
-  include("C:/praktika/tests/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/EisenNotion_tests[1]_tests.cmake")
-else()
-  add_test(EisenNotion_tests_NOT_BUILT EisenNotion_tests_NOT_BUILT)
-endif()
