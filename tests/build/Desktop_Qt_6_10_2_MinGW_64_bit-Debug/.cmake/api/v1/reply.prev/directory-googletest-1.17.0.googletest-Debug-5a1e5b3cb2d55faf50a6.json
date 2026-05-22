@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "googletest-1.17.0/googletest",
+		"source" : "googletest-1.17.0/googletest"
+	}
+}

@@ -5,23 +5,18 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-# Добавляем Multimedia, чтобы taskmanager.h не ругался
 find_package(Qt6 REQUIRED COMPONENTS Core Multimedia)
 
-# --- FetchContent для Google Test ---
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        v1.14.0
-)
-set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/_deps)
-FetchContent_MakeAvailable(googletest)
-
+# Отключаем тесты и примеры внутри Google Test, чтобы не замедлять сборку
+set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
 set(gtest_build_tests OFF CACHE BOOL "" FORCE)
+set(gtest_build_samples OFF CACHE BOOL "" FORCE)
 set(gmock_build_tests OFF CACHE BOOL "" FORCE)
 
-# --- Тестовые файлы ---
+# Подключаем локальный Google Test (папка лежит рядом с этим CMakeLists)
+add_subdirectory(${CMAKE_SOURCE_DIR}/googletest-1.17.0)
+
+# Наши тестовые файлы
 set(TEST_SOURCES
     test_task.cpp
     test_taskmanager.cpp
@@ -30,21 +25,24 @@ set(TEST_SOURCES
 
 add_executable(EisenNotion_tests ${TEST_SOURCES})
 
-# --- Исходники ядра ---
+# Исходники ядра (основной проект)
 target_sources(EisenNotion_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/../src/task.cpp
     ${CMAKE_SOURCE_DIR}/../src/taskmanager.cpp
     ${CMAKE_SOURCE_DIR}/../src/jsonstorage.cpp
 )
 
-# --- Инклюды ---
+# Инклюды
 target_include_directories(EisenNotion_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/../src
+    ${CMAKE_SOURCE_DIR}/googletest-1.17.0/googletest/include
+    ${CMAKE_SOURCE_DIR}/googletest-1.17.0/googlemock/include
 )
 
-# --- Линковка (Multimedia добавлен) ---
+# Линкуем
 target_link_libraries(EisenNotion_tests PRIVATE
     gtest_main
+    gmock
     Qt6::Core
     Qt6::Multimedia
 )

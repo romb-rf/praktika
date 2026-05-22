@@ -1,0 +1,13 @@
+gtest_main_autogen/timestamp: \
+	C:/praktika/tests/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/.qtcreator/cmake-helper/package-manager.cmake \
+	C:/praktika/tests/build/Desktop_Qt_6_10_2_MinGW_64_bit-Debug/.qtcreator/cmake-helper/qtcreator-project.cmake \
+	C:/praktika/tests/googletest-1.17.0/googletest/CMakeLists.txt \
+	C:/praktika/tests/googletest-1.17.0/googletest/cmake/Config.cmake.in \
+	C:/praktika/tests/googletest-1.17.0/googletest/cmake/gtest.pc.in \
+	C:/praktika/tests/googletest-1.17.0/googletest/cmake/gtest_main.pc.in \
+	C:/praktika/tests/googletest-1.17.0/googletest/cmake/internal_utils.cmake \
+	C:/praktika/tests/googletest-1.17.0/googletest/src/gtest_main.cc \
+	E:/qt/Tools/CMake_64/share/cmake-3.30/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in \
+	E:/qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakePackageConfigHelpers.cmake \
+	E:/qt/Tools/CMake_64/share/cmake-3.30/Modules/WriteBasicConfigVersionFile.cmake \
+	E:/qt/Tools/CMake_64/bin/cmake.exe
